@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Landra's 60th Birthday</title>
+    <meta
+      name="description"
+      content="You're invited to Landra's 60th Birthday — December 20, 2026, Ambai Restaurant, QC. Shhh.. it's a surprise!"
+    />
+    <meta name="theme-color" content="#FAEFD9" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital@1&family=EB+Garamond:ital@1&family=Pinyon+Script&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --s: 1;
+        --ink: #55602a;
+        --ink-dark: #3b4419;
+        --paper: #faefd9;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        background: #ede2c8;
+      }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "EB Garamond", Georgia, serif;
+        font-style: italic;
+      }
+      body.locked {
+        overflow: hidden;
+      }
+      body.locked .screen:not(#top) {
+        display: none;
+      }
+      a {
+        color: var(--ink);
+      }
+      a:hover {
+        color: var(--ink-dark);
+      }
+      p,
+      h1,
+      h2 {
+        margin: 0;
+        font-weight: 400;
+      }
+
+      /* Every screen is drawn at the 390x844 design size and zoomed to fit the viewport (see fit()). */
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .screen {
+        zoom: var(--s);
+        position: relative;
+        width: 390px;
+        height: 844px;
+        overflow: hidden;
+        background: var(--paper);
+        scroll-snap-align: center;
+      }
+      .frame {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0;
+        transform: scale(1.06);
+        transition:
+          opacity 1.6s ease,
+          transform 2.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      @media (min-width: 600px) {
+        html {
+          scroll-snap-type: y proximity;
+        }
+        main {
+          gap: 40px;
+          padding: 40px 0;
+        }
+        .screen {
+          border-radius: 18px;
+          box-shadow: 0 18px 50px rgba(85, 96, 42, 0.18);
+        }
+      }
+
+      /* Scroll reveal: .in is added when a screen enters the viewport */
+      .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 0.9s ease,
+          transform 50s cubic-bezier(0.2, 0.7, 0.2, 1);
+        transition-delay: calc(var(--i, 0) * 200ms + 200ms);
+      }
+      .in .reveal,
+      .in .frame {
+        opacity: 1;
+        transform: none;
+      }
+      .in .write {
+        animation: write 1.6s ease forwards;
+        animation-delay: calc(var(--i, 0) * 140ms + 200ms);
+      }
+      @keyframes write {
+        from {
+          clip-path: inset(-30% 100% -30% 0);
+        }
+        to {
+          clip-path: inset(-30% -10% -30% -10%);
+        }
+      }
+      .write {
+        clip-path: inset(-30% 100% -30% 0);
+      }
+
+      .script {
+        font-family: "Pinyon Script", cursive;
+        font-style: normal;
+      }
+      .mono {
+        font-family: "Courier Prime", "Courier New", monospace;
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      }
+      .pill {
+        min-height: 44px;
+        padding: 0 20px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 16px;
+        letter-spacing: 0.08em;
+        border: 1px solid var(--ink);
+        cursor: pointer;
+        font: inherit;
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease;
+      }
+      .pill:hover {
+        transform: translateY(-2px);
+      }
+      .pill.solid {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .pill.solid:hover {
+        background: var(--ink-dark);
+        color: var(--paper);
+      }
+      nav {
+        display: flex;
+        gap: 10px;
+      }
+      nav .pill {
+        font-size: 16px;
+      }
+
+      /* Envelope */
+      .envelope {
+        position: relative;
+        width: 300px;
+        height: 210px;
+        margin-top: 150px;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        display: block;
+      }
+      .closed .envelope {
+        animation: bob 3.2s ease-in-out infinite;
+      }
+      .envelope span,
+      .envelope img {
+        position: absolute;
+        display: block;
+      }
+      .env-back {
+        inset: 0;
+        background: #e9d5ab;
+        border-radius: 4px;
+      }
+      .card {
+        left: 20px;
+        top: 12px;
+        width: 260px;
+        height: 186px;
+        background: #fffcf3;
+        border: 1px solid #e3d3ad;
+        border-radius: 3px;
+        z-index: 2;
+        padding-top: 12px;
+        text-align: center;
+        color: var(--ink);
+        transition: transform 0.9s ease 0.45s;
+      }
+      .opened .card {
+        transform: translateY(-122px);
+      }
+      .card .small {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .side {
+        inset: 0;
+        z-index: 3;
+      }
+      .flap {
+        left: 0;
+        top: 0;
+        width: 300px;
+        height: 118px;
+        background: #e6d1a3;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+        transform-origin: 50% 0;
+        transform: perspective(900px) rotateX(0);
+        transition:
+          transform 0.7s ease,
+          z-index 0s 0.35s;
+        z-index: 4;
+      }
+      .opened .flap {
+        transform: perspective(900px) rotateX(180deg);
+        z-index: 1;
+      }
+      .seal {
+        left: 114px;
+        top: 82px;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        z-index: 5;
+        box-shadow: 0 3px 8px rgba(70, 60, 20, 0.28);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+      .closed .seal {
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+      .opened .seal {
+        opacity: 0;
+        transform: scale(0.6);
+      }
+      .opened .hint,
+      .closed .cta {
+        display: none;
+      }
+      .cta {
+        margin-top: 52px;
+        animation: fadeUp 0.8s ease 1.2s both;
+        font-size: 18px;
+        letter-spacing: 0.12em;
+        padding: 0 28px;
+      }
+      .hint {
+        margin-top: 52px;
+        font-size: 17px;
+        letter-spacing: 0.14em;
+        animation: breathe 2.6s ease-in-out infinite;
+      }
+      @keyframes bob {
+        50% {
+          transform: translateY(-8px) rotate(-0.6deg);
+        }
+      }
+      @keyframes pulse {
+        50% {
+          transform: scale(1.07);
+        }
+      }
+      @keyframes breathe {
+        50% {
+          opacity: 0.45;
+        }
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+      }
+
+      /* Dress-code palette */
+      .swatches {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 8px;
+      }
+      .swatches span {
+        width: 34px;
+        height: 33px;
+        display: block;
+        transform: scale(0);
+        transition: transform 0.6s cubic-bezier(0.3, 1.6, 0.5, 1);
+        transition-delay: calc(var(--d) * 110ms + 900ms);
+      }
+      .in .swatches span {
+        transform: scale(1);
+      }
+      .swatches span:hover {
+        animation: wobble 0.6s ease;
+      }
+      @keyframes wobble {
+        30% {
+          transform: scale(1.18) rotate(-8deg);
+        }
+        60% {
+          transform: scale(0.95) rotate(5deg);
+        }
+      }
+
+      .qr {
+        background: #fffdf6;
+        border: 1px solid #e6d6af;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 6px 18px rgba(85, 96, 42, 0.14);
+      }
+      .qr img {
+        display: block;
+        width: 128px;
+        height: 128px;
+      }
+
+      /* Falling petals after the envelope opens */
+      .petals {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 10;
+      }
+      .petals i {
+        position: absolute;
+        top: -30px;
+        width: 14px;
+        height: 12px;
+        border-radius: 60% 0 60% 0;
+        animation: fall var(--t) linear var(--delay) forwards;
+      }
+      @keyframes fall {
+        to {
+          transform: translate(var(--x), 110vh) rotate(var(--r));
+          opacity: 0.2;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        .write {
+          clip-path: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="locked">
+    <main>
+      <section class="screen closed in" id="top" aria-label="Envelope">
+        <img
+          class="frame"
+          src="assets/frame-full.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="content" style="padding-top: 128px">
+          <p class="reveal" style="font-size: 24px; letter-spacing: 0.1em">
+            Shhh.. It’s a surprise!
+          </p>
+          <p
+            class="reveal"
+            style="
+              --i: 1;
+              margin-top: 10px;
+              font-size: 16px;
+              letter-spacing: 0.1em;
+              width: 230px;
+              line-height: 1.5;
+            "
+          >
+            A little something has arrived for you
+          </p>
+          <button
+            type="button"
+            class="envelope"
+            id="envelope"
+            aria-label="Open the envelope"
+            aria-expanded="false"
+          >
+            <span class="env-back"></span>
+            <span class="card">
+              <span style="position: static" class="small"
+                >You’re invited to</span
+              >
+              <span
+                style="
+                  position: static;
+                  font-size: 40px;
+                  line-height: 1.05;
+                  margin-top: 4px;
+                "
+                class="script"
+                >Landra’s</span
+              >
+              <span
+                style="position: static; font-size: 26px; line-height: 1.1"
+                class="script"
+                >60th Birthday</span
+              >
+            </span>
+            <span
+              class="side"
+              style="
+                background: #e1ca9a;
+                clip-path: polygon(0 0, 52% 54%, 0 100%);
+              "
+            ></span>
+            <span
+              class="side"
+              style="
+                background: #e1ca9a;
+                clip-path: polygon(100% 0, 48% 54%, 100% 100%);
+              "
+            ></span>
+            <span
+              class="side"
+              style="
+                background: #efddb5;
+                clip-path: polygon(0 100%, 50% 46%, 100% 100%);
+              "
+            ></span>
+            <span class="flap"></span>
+            <img class="seal" src="assets/seal.png" alt="" aria-hidden="true" />
+          </button>
+          <p class="hint">Tap the envelope to open</p>
+          <a class="pill solid cta" href="#invite">View invitation</a>
+        </div>
+      </section>
+
+      <section class="screen" id="invite" aria-label="You're invited">
+        <img
+          class="frame"
+          src="assets/frame-full.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="content" style="padding-top: 112px">
+          <svg
+            class="reveal"
+            viewBox="0 0 260 60"
+            width="260"
+            height="60"
+            role="img"
+            aria-label="You’re invited to"
+          >
+            <path id="arc" d="M 18 56 Q 130 -8 242 56" fill="none" />
+            <text
+              font-family="'EB Garamond', Georgia, serif"
+              font-style="italic"
+              font-size="15"
+              letter-spacing="2.4"
+              fill="#55602A"
+            >
+              <textPath href="#arc" startOffset="50%" text-anchor="middle">
+                YOU’RE INVITED TO
+              </textPath>
+            </text>
+          </svg>
+          <h1
+            class="script write"
+            style="--i: 1; margin-top: 14px; font-size: 70px; line-height: 1"
+          >
+            Landra’s
+          </h1>
+          <p
+            class="script write"
+            style="--i: 4; margin-top: 22px; font-size: 62px; line-height: 1.02"
+          >
+            60th<br />Birthday
+          </p>
+          <p
+            class="reveal"
+            style="
+              --i: 7;
+              margin-top: 40px;
+              font-size: 20px;
+              letter-spacing: 0.12em;
+            "
+          >
+            Shhh.. It’s a surprise!
+          </p>
+          <div
+            class="reveal"
+            style="
+              --i: 8;
+              margin-top: 38px;
+              font-size: 19px;
+              letter-spacing: 0.1em;
+              line-height: 1.55;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+              "
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="#55602A"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"
+                />
+                <circle cx="12" cy="9.5" r="2.5" />
+              </svg>
+              <span>Ambai Restaurant, Qc</span>
+            </div>
+            <div>December 20, 2026</div>
+            <div>11am - 3pm</div>
+          </div>
+          <nav
+            class="reveal"
+            style="--i: 9; margin-top: 34px"
+            aria-label="Invitation pages"
+          >
+            <a class="pill" href="#top">← Back</a>
+            <a class="pill solid" href="#rsvp">RSVP &amp; dress code →</a>
+          </nav>
+        </div>
+      </section>
+
+      <section class="screen" id="rsvp" aria-label="RSVP and dress code">
+        <img
+          class="frame"
+          src="assets/frame-light.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="content" style="padding-top: 140px">
+          <div
+            class="reveal"
+            style="
+              width: 240px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 16px;
+            "
+          >
+            <h2 class="mono" style="font-size: 28px; letter-spacing: 0.14em">
+              RSVP
+            </h2>
+            <p
+              style="font-size: 17px; letter-spacing: 0.12em; line-height: 1.5"
+            >
+              Please confirm your attendance<br />ON or BEFORE<br />November 10,
+              2026.
+            </p>
+          </div>
+          <div
+            class="reveal"
+            style="
+              --i: 2;
+              width: 240px;
+              margin-top: 56px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 16px;
+            "
+          >
+            <h2 class="mono" style="font-size: 26px; letter-spacing: 0.1em">
+              Dress code:
+            </h2>
+            <p
+              style="font-size: 20px; letter-spacing: 0.1em; line-height: 1.55"
+            >
+              Kindly wear your most elegant and chic attire in soft pastel
+              shades ONLY.
+            </p>
+            <div
+              class="swatches"
+              role="img"
+              aria-label="Color palette: periwinkle blue, buttercream, blush pink, peach orange, sage green and lavender"
+            >
+              <span
+                style="
+                  --d: 0;
+                  background: #aab4e4;
+                  border-radius: 52% 48% 55% 45% / 50% 55% 45% 50%;
+                "
+              ></span>
+              <span
+                style="
+                  --d: 1;
+                  background: #ffe8be;
+                  border-radius: 45% 55% 48% 52% / 55% 45% 55% 45%;
+                "
+              ></span>
+              <span
+                style="
+                  --d: 2;
+                  background: #ff9fa6;
+                  border-radius: 55% 45% 50% 50% / 48% 52% 48% 52%;
+                "
+              ></span>
+              <span
+                style="
+                  --d: 3;
+                  background: #ff9f5a;
+                  border-radius: 50% 50% 45% 55% / 52% 48% 52% 48%;
+                "
+              ></span>
+              <span
+                style="
+                  --d: 4;
+                  background: #9ca66f;
+                  border-radius: 48% 52% 55% 45% / 55% 45% 50% 50%;
+                "
+              ></span>
+              <span
+                style="
+                  --d: 5;
+                  background: #a89ccb;
+                  border-radius: 52% 48% 48% 52% / 45% 55% 45% 55%;
+                "
+              ></span>
+            </div>
+          </div>
+          <nav
+            class="reveal"
+            style="--i: 5; margin-top: 56px"
+            aria-label="Invitation pages"
+          >
+            <a class="pill" href="#invite">← Back</a>
+            <a class="pill solid" href="#location">Location →</a>
+          </nav>
+        </div>
+      </section>
+
+      <section class="screen" id="location" aria-label="Location and map">
+        <img
+          class="frame"
+          src="assets/frame-light.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="content" style="padding-top: 118px">
+          <div
+            class="reveal"
+            style="
+              width: 300px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <h2 class="mono" style="font-size: 26px; letter-spacing: 0.1em">
+              Event location:
+            </h2>
+            <div
+              style="
+                margin-top: 6px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="#55602A"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"
+                />
+                <circle cx="12" cy="9.5" r="2.5" />
+              </svg>
+              <p
+                style="
+                  font-size: 22px;
+                  letter-spacing: 0.06em;
+                  line-height: 1.2;
+                "
+              >
+                AMBAI Modern Tambayan
+              </p>
+            </div>
+            <p
+              style="font-size: 16px; letter-spacing: 0.08em; line-height: 1.45"
+            >
+              88 Matahimik Street,<br />Corner Matino Street
+            </p>
+          </div>
+          <figure
+            class="reveal"
+            style="
+              --i: 2;
+              margin: 26px 0 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <div class="qr">
+              <img
+                src="assets/qr.png"
+                alt="QR code that opens AMBAI Modern Tambayan in Google Maps"
+              />
+            </div>
+            <figcaption style="font-size: 15px; letter-spacing: 0.1em">
+              Scan for the map &amp; directions
+            </figcaption>
+          </figure>
+          <a
+            class="reveal"
+            href="https://www.google.com/maps/search/?api=1&amp;query=AMBAI+Modern+Tambayan+88+Matahimik+Street+Quezon+City"
+            target="_blank"
+            rel="noopener"
+            style="
+              --i: 3;
+              margin-top: 6px;
+              min-height: 44px;
+              display: inline-flex;
+              align-items: center;
+              font-size: 16px;
+              letter-spacing: 0.08em;
+            "
+            >Open in Google Maps</a
+          >
+          <p
+            class="reveal"
+            style="
+              --i: 4;
+              margin-top: 10px;
+              width: 250px;
+              font-size: 17px;
+              letter-spacing: 0.08em;
+              line-height: 1.5;
+            "
+          >
+            Your presence will make our celebration even more special. We can’t
+            wait to see you there!
+          </p>
+          <nav
+            class="reveal"
+            style="--i: 5; margin-top: 22px"
+            aria-label="Invitation pages"
+          >
+            <a class="pill" href="#rsvp">← Back</a>
+            <a class="pill solid" href="#top">Back to envelope</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+    <div class="petals" aria-hidden="true"></div>
+
+    <script>
+      const root = document.documentElement;
+      const top_ = document.getElementById("top");
+      const envelope = document.getElementById("envelope");
+      const reduceMotion = matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      // Phones: fill the width. Wider screens: fit one whole screen in the viewport height.
+      function fit() {
+        const w = root.clientWidth; // excludes the scrollbar, unlike innerWidth
+        const s = w < 600 ? w / 390 : Math.min((innerHeight - 48) / 844, 1.25);
+        root.style.setProperty("--s", s.toFixed(4));
+      }
+      fit();
+      addEventListener("resize", fit);
+
+      envelope.addEventListener("click", () => {
+        const opened = top_.classList.toggle("opened");
+        top_.classList.toggle("closed", !opened);
+        envelope.setAttribute("aria-expanded", opened);
+        if (!opened) return;
+        document.body.classList.remove("locked");
+        fit();
+        if (!reduceMotion) setTimeout(petals, 600);
+      });
+
+      function petals() {
+        const box = document.querySelector(".petals");
+        const colors = [
+          "#AAB4E4",
+          "#FFE8BE",
+          "#FF9FA6",
+          "#FF9F5A",
+          "#9CA66F",
+          "#A89CCB",
+        ];
+        for (let n = 0; n < 36; n++) {
+          const p = document.createElement("i");
+          p.style.cssText =
+            `left:${Math.random() * 100}%;background:${colors[n % colors.length]};` +
+            `--t:${4 + Math.random() * 4}s;--delay:${Math.random() * 1.5}s;` +
+            `--x:${(Math.random() - 0.5) * 200}px;--r:${(Math.random() - 0.5) * 900}deg;` +
+            `width:${8 + Math.random() * 10}px;height:${7 + Math.random() * 8}px`;
+          p.addEventListener("animationend", () => p.remove());
+          box.appendChild(p);
+        }
+      }
+
+      // Section buttons (Back / Next): glide to the target section.
+      // Adjust these two values to change how the move feels.
+      const SCROLL_DURATION = 1200; // milliseconds
+      const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2); // ease-in-out
+
+      document.querySelectorAll('a[href^="#"]').forEach((link) =>
+        link.addEventListener("click", (e) => {
+          const target = document.querySelector(link.getAttribute("href"));
+          if (!target) return;
+          e.preventDefault();
+          const r = target.getBoundingClientRect();
+          const to = scrollY + r.top - Math.max(0, (innerHeight - r.height) / 2); // centre it when it fits
+          const from = scrollY;
+          const duration = reduceMotion ? 0 : SCROLL_DURATION;
+          const start = performance.now();
+          root.style.scrollSnapType = "none"; // snapping would fight the glide
+          (function step(now) {
+            const t = duration ? Math.min(1, (now - start) / duration) : 1;
+            scrollTo({ top: from + (to - from) * ease(t), behavior: "instant" });
+            if (t < 1) requestAnimationFrame(step);
+            else root.style.scrollSnapType = "";
+          })(start);
+          history.replaceState(null, "", link.getAttribute("href"));
+        }),
+      );
+
+      // Play each screen's entrance once it scrolls into view.
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            }
+          }),
+        { threshold: 0.25 },
+      );
+      document
+        .querySelectorAll(".screen:not(#top)")
+        .forEach((s) => io.observe(s));
+    </script>
+  </body>
+</html>
