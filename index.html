@@ -859,26 +859,69 @@
       const SCROLL_DURATION = 1200; // milliseconds
       const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2); // ease-in-out
 
+      function glideTo(target) {
+        const r = target.getBoundingClientRect();
+        const to = scrollY + r.top - Math.max(0, (innerHeight - r.height) / 2); // centre it when it fits
+        const from = scrollY;
+        const duration = reduceMotion ? 0 : SCROLL_DURATION;
+        const start = performance.now();
+        root.style.scrollSnapType = "none"; // snapping would fight the glide
+        (function step(now) {
+          const t = duration ? Math.min(1, (now - start) / duration) : 1;
+          scrollTo({ top: from + (to - from) * ease(t), behavior: "instant" });
+          if (t < 1) requestAnimationFrame(step);
+          else root.style.scrollSnapType = "";
+        })(start);
+        history.replaceState(null, "", "#" + target.id);
+      }
+
       document.querySelectorAll('a[href^="#"]').forEach((link) =>
         link.addEventListener("click", (e) => {
           const target = document.querySelector(link.getAttribute("href"));
           if (!target) return;
           e.preventDefault();
-          const r = target.getBoundingClientRect();
-          const to = scrollY + r.top - Math.max(0, (innerHeight - r.height) / 2); // centre it when it fits
-          const from = scrollY;
-          const duration = reduceMotion ? 0 : SCROLL_DURATION;
-          const start = performance.now();
-          root.style.scrollSnapType = "none"; // snapping would fight the glide
-          (function step(now) {
-            const t = duration ? Math.min(1, (now - start) / duration) : 1;
-            scrollTo({ top: from + (to - from) * ease(t), behavior: "instant" });
-            if (t < 1) requestAnimationFrame(step);
-            else root.style.scrollSnapType = "";
-          })(start);
-          history.replaceState(null, "", link.getAttribute("href"));
+          glideTo(target);
         }),
       );
+
+      // Auto trigger for guests who don't know to tap or scroll: after IDLE_MS
+      // without any touch, scroll, click or key, open the envelope, then move to
+      // the next section not seen yet. It only moves forward, never back to a
+      // section already visited.
+      const IDLE_MS = 3000; // milliseconds of inactivity before the next step
+      const visited = { top: true, invite: false, rsvp: false, location: false };
+      let idleTimer;
+
+      function markVisible() {
+        const mid = innerHeight / 2;
+        for (const id in visited) {
+          const r = document.getElementById(id).getBoundingClientRect();
+          if (r.top <= mid && r.bottom >= mid) visited[id] = true;
+        }
+      }
+
+      function autoNext() {
+        if (!top_.classList.contains("opened")) envelope.click();
+        else {
+          const ids = Object.keys(visited);
+          const next = ids[ids.findLastIndex((id) => visited[id]) + 1];
+          if (!next) return; // every section seen: stop for good
+          visited[next] = true;
+          glideTo(document.getElementById(next));
+        }
+        resetIdle();
+      }
+
+      function resetIdle() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(autoNext, IDLE_MS);
+      }
+
+      ["pointerdown", "touchstart", "wheel", "keydown", "mousemove"].forEach((ev) =>
+        addEventListener(ev, resetIdle, { passive: true }),
+      );
+      addEventListener("scroll", () => (markVisible(), resetIdle()), { passive: true });
+      resetIdle();
 
       // Play each screen's entrance once it scrolls into view.
       const io = new IntersectionObserver(
